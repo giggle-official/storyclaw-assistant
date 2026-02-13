@@ -8,6 +8,7 @@ export type AuthChoiceOption = {
 };
 
 export type AuthChoiceGroupId =
+  | "storyclaw"
   | "openai"
   | "anthropic"
   | "google"
@@ -42,6 +43,12 @@ const AUTH_CHOICE_GROUP_DEFS: {
   hint?: string;
   choices: AuthChoice[];
 }[] = [
+  {
+    value: "storyclaw",
+    label: "StoryClaw",
+    hint: "Kimi Code 2.5 (recommended)",
+    choices: ["storyclaw-api-key"],
+  },
   {
     value: "openai",
     label: "OpenAI",
@@ -170,6 +177,12 @@ export function buildAuthChoiceOptions(params: {
 }): AuthChoiceOption[] {
   void params.store;
   const options: AuthChoiceOption[] = [];
+
+  options.push({
+    value: "storyclaw-api-key",
+    label: "StoryClaw API key",
+    hint: "Get key at app.storyclaw.com",
+  });
 
   options.push({
     value: "token",

@@ -153,9 +153,16 @@ export async function promptDefaultModel(
     });
   }
 
-  const providers = Array.from(new Set(models.map((entry) => entry.provider))).toSorted((a, b) =>
-    a.localeCompare(b),
-  );
+  const providers = Array.from(new Set(models.map((entry) => entry.provider))).toSorted((a, b) => {
+    // Pin storyclaw to the top of the provider list.
+    if (a === "storyclaw") {
+      return -1;
+    }
+    if (b === "storyclaw") {
+      return 1;
+    }
+    return a.localeCompare(b);
+  });
 
   const hasPreferredProvider = preferredProvider ? providers.includes(preferredProvider) : false;
   const shouldPromptProvider =

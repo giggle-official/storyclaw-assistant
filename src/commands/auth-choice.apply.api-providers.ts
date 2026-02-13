@@ -29,6 +29,8 @@ import {
   applyOpencodeZenProviderConfig,
   applyOpenrouterConfig,
   applyOpenrouterProviderConfig,
+  applyStoryclawConfig,
+  applyStoryclawProviderConfig,
   applySyntheticConfig,
   applySyntheticProviderConfig,
   applyTogetherConfig,
@@ -53,6 +55,8 @@ import {
   VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF,
   XIAOMI_DEFAULT_MODEL_REF,
   setCloudflareAiGatewayConfig,
+  setStoryclawApiKey,
+  STORYCLAW_DEFAULT_MODEL_REF,
   setQianfanApiKey,
   setGeminiApiKey,
   setLitellmApiKey,
@@ -124,7 +128,69 @@ export async function applyAuthChoiceApiProviders(
       authChoice = "opencode-zen";
     } else if (params.opts.tokenProvider === "qianfan") {
       authChoice = "qianfan-api-key";
+    } else if (params.opts.tokenProvider === "storyclaw") {
+      authChoice = "storyclaw-api-key";
     }
+  }
+
+  if (authChoice === "storyclaw-api-key") {
+    const store = ensureAuthProfileStore(params.agentDir, { allowKeychainPrompt: false });
+    const profileOrder = resolveAuthProfileOrder({ cfg: nextConfig, store, provider: "storyclaw" });
+    const existingProfileId = profileOrder.find((profileId) => Boolean(store.profiles[profileId]));
+    const existingCred = existingProfileId ? store.profiles[existingProfileId] : undefined;
+    let profileId = "storyclaw:default";
+    let hasCredential = false;
+
+    if (existingProfileId && existingCred?.type === "api_key") {
+      profileId = existingProfileId;
+      hasCredential = true;
+    }
+    if (!hasCredential && params.opts?.token && params.opts?.tokenProvider === "storyclaw") {
+      await setStoryclawApiKey(normalizeApiKeyInput(params.opts.token), params.agentDir);
+      hasCredential = true;
+    }
+    if (!hasCredential) {
+      const envKey = resolveEnvApiKey("storyclaw");
+      if (envKey) {
+        const useExisting = await params.prompter.confirm({
+          message: `Use existing STORYCLAW_API_KEY (${envKey.source}, ${formatApiKeyPreview(envKey.apiKey)})?`,
+          initialValue: true,
+        });
+        if (useExisting) {
+          await setStoryclawApiKey(envKey.apiKey, params.agentDir);
+          hasCredential = true;
+        }
+      }
+    }
+    if (!hasCredential) {
+      await params.prompter.note("Get your API key at https://app.storyclaw.com", "StoryClaw");
+      const key = await params.prompter.text({
+        message: "Enter StoryClaw API key",
+        validate: validateApiKeyInput,
+      });
+      await setStoryclawApiKey(normalizeApiKeyInput(String(key ?? "")), params.agentDir);
+      hasCredential = true;
+    }
+    if (hasCredential) {
+      nextConfig = applyAuthProfileConfig(nextConfig, {
+        profileId,
+        provider: "storyclaw",
+        mode: "api_key",
+      });
+    }
+    const applied = await applyDefaultModelChoice({
+      config: nextConfig,
+      setDefaultModel: params.setDefaultModel,
+      defaultModel: STORYCLAW_DEFAULT_MODEL_REF,
+      applyDefaultConfig: applyStoryclawConfig,
+      applyProviderConfig: applyStoryclawProviderConfig,
+      noteDefault: STORYCLAW_DEFAULT_MODEL_REF,
+      noteAgentModel,
+      prompter: params.prompter,
+    });
+    nextConfig = applied.config;
+    agentModelOverride = applied.agentModelOverride ?? agentModelOverride;
+    return { config: nextConfig, agentModelOverride };
   }
 
   if (authChoice === "openrouter-api-key") {

@@ -156,6 +156,30 @@ export function buildZaiModelDefinition(params: {
   };
 }
 
+export const STORYCLAW_BASE_URL = "https://air-v3-test.gqapi.com/openai/v1";
+export const STORYCLAW_DEFAULT_MODEL_ID = "kimi-k2.5";
+export const STORYCLAW_DEFAULT_MODEL_REF = `storyclaw/${STORYCLAW_DEFAULT_MODEL_ID}`;
+export const STORYCLAW_DEFAULT_CONTEXT_WINDOW = 200_000;
+export const STORYCLAW_DEFAULT_MAX_TOKENS = 8192;
+export const STORYCLAW_DEFAULT_COST = {
+  input: 0,
+  output: 0,
+  cacheRead: 0,
+  cacheWrite: 0,
+};
+
+export function buildStoryclawModelDefinition(): ModelDefinitionConfig {
+  return {
+    id: STORYCLAW_DEFAULT_MODEL_ID,
+    name: "Kimi Code 2.5",
+    reasoning: false,
+    input: ["text"],
+    cost: STORYCLAW_DEFAULT_COST,
+    contextWindow: STORYCLAW_DEFAULT_CONTEXT_WINDOW,
+    maxTokens: STORYCLAW_DEFAULT_MAX_TOKENS,
+  };
+}
+
 export const XAI_BASE_URL = "https://api.x.ai/v1";
 export const XAI_DEFAULT_MODEL_ID = "grok-4";
 export const XAI_DEFAULT_MODEL_REF = `xai/${XAI_DEFAULT_MODEL_ID}`;
