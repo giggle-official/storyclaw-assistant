@@ -40,6 +40,11 @@ function parseOrigin(
   }
 }
 
+const BUILTIN_ALLOWED_ORIGINS = new Set([
+  "https://storyclaw.com",
+  "https://app.storyclaw.com",
+]);
+
 export function checkBrowserOrigin(params: {
   requestHost?: string;
   origin?: string;
@@ -48,6 +53,17 @@ export function checkBrowserOrigin(params: {
   const parsedOrigin = parseOrigin(params.origin);
   if (!parsedOrigin) {
     return { ok: false, reason: "origin missing or invalid" };
+  }
+
+  // Loopback origins (localhost / 127.x) are always trusted — the browser
+  // guarantees the Origin header, so a localhost origin means the page runs
+  // on the same machine and the user has local access.
+  if (isLoopbackHost(parsedOrigin.hostname)) {
+    return { ok: true };
+  }
+
+  if (BUILTIN_ALLOWED_ORIGINS.has(parsedOrigin.origin)) {
+    return { ok: true };
   }
 
   const allowlist = (params.allowedOrigins ?? [])
@@ -59,11 +75,6 @@ export function checkBrowserOrigin(params: {
 
   const requestHost = normalizeHostHeader(params.requestHost);
   if (requestHost && parsedOrigin.host === requestHost) {
-    return { ok: true };
-  }
-
-  const requestHostname = resolveHostName(requestHost);
-  if (isLoopbackHost(parsedOrigin.hostname) && isLoopbackHost(requestHostname)) {
     return { ok: true };
   }
 
