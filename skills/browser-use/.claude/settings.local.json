@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(defaults read:*)",
+      "Bash(head:*)",
+      "Bash(grep:*)",
+      "Bash(plutil -convert json ~/Library/Preferences/com.googlecode.iterm2.plist -o - 2>/dev/null | python3 -c \"\nimport json, sys\ndata = json.load\\(sys.stdin\\)\n# Look for Tab Style key \\(with space\\)\nfor k in data.keys\\(\\):\n    if 'tab' in k.lower\\(\\) or 'Tab' in k:\n        print\\(f'{k}: {repr\\(data[k]\\)}'\\)\n\" 2>/dev/null)",
+      "Bash(plutil -convert json ~/Library/Preferences/com.googlecode.iterm2.plist -o - 2>/dev/null | python3 -c \"\nimport json, sys\ndata = json.load\\(sys.stdin\\)\n# Look at New Bookmarks \\(profiles\\)\nprofiles = data.get\\('New Bookmarks', []\\)\nfor p in profiles:\n    print\\('Profile:', p.get\\('Name'\\), '| Guid:', p.get\\('Guid'\\)\\)\n    print\\('  Custom Directory:', p.get\\('Custom Directory'\\)\\)\n    color_preset = p.get\\('Color Preset'\\)\n    print\\('  Color Preset:', color_preset\\)\n    bg = p.get\\('Background Color'\\)\n    print\\('  BG Color:', bg\\)\n    print\\(\\)\n\" 2>/dev/null)",
+      "Bash(defaults write:*)",
+      "Bash(python3:*)",
+      "Bash(plutil:*)"
+    ]
+  }
+}

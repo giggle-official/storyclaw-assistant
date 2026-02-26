@@ -31,6 +31,7 @@ import {
 import { setupInternalHooks } from "../commands/onboard-hooks.js";
 import { promptRemoteGatewayConfig } from "../commands/onboard-remote.js";
 import { setupSkills } from "../commands/onboard-skills.js";
+import { ensureStoryclawAgents } from "../commands/storyclaw-agents.js";
 import {
   DEFAULT_GATEWAY_PORT,
   readConfigFileSnapshot,
@@ -454,6 +455,9 @@ export async function runOnboardingWizard(
   await ensureWorkspaceAndSessions(workspaceDir, runtime, {
     skipBootstrap: Boolean(nextConfig.agents?.defaults?.skipBootstrap),
   });
+
+  nextConfig = await ensureStoryclawAgents(nextConfig, runtime);
+  await writeConfigFile(nextConfig);
 
   if (opts.skipSkills) {
     await prompter.note("Skipping skills setup.", "Skills");
