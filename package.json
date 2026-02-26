@@ -1,6 +1,6 @@
 {
   "name": "storyclaw-assistant",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Multi-channel AI gateway with extensible messaging integrations",
   "keywords": [],
   "license": "MIT",
