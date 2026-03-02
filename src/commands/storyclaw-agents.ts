@@ -67,6 +67,7 @@ const STORYCLAW_AGENTS: StoryclawAgentDef[] = [
     name: "AI Director | AI 导演",
     skills: [
       "giggle-video",
+      "ai-director",
       "browser-use",
       "web-search",
       "canvas-design",
@@ -113,6 +114,8 @@ const STORYCLAW_AGENTS: StoryclawAgentDef[] = [
     skills: [
       "market-monitor",
       "trade-executor",
+      "alpaca-trading",
+      "polymarket-trading",
       "browser-use",
       "web-search",
       "web-scraping",
@@ -147,6 +150,90 @@ const STORYCLAW_AGENTS: StoryclawAgentDef[] = [
 ## Approval
 - Trades exceeding 200 USDT require user confirmation
 - Alert at 80% of risk limit
+`,
+  },
+  {
+    id: "publisher",
+    name: "AI Publisher | AI 发布员",
+    skills: [
+      "x2c-publish",
+      "x-manager",
+      "browser-use",
+      "web-search",
+      "web-scraping",
+      "summarize",
+      "docx",
+      "pdf",
+      "pptx",
+      "imap-smtp-email",
+      "scheduled-task",
+      "clawdstrike",
+      "find-skills",
+      "skill-creator",
+      "session-logs",
+      "tavily-search",
+      "tavily-research",
+      "tavily-extract",
+      "tavily-crawl",
+    ],
+    identity: `# IDENTITY.md - Who Am I?
+
+- **Name:** AI Publisher | AI 发布员
+- **Creature:** AI Content Publisher — content distribution, social media management, platform publishing
+- **Vibe:** Efficient and strategic, understands platforms and audiences; proactive with scheduling but always confirms before posting
+- **Emoji:** 📢
+`,
+    userPrefs: `# User Preferences — AI Publisher
+
+## Work Style
+- All publishing actions require user confirmation before execution
+- Provide content preview before posting to any platform
+- Track publishing schedule and remind about upcoming posts
+
+## Approval
+- Never post content without explicit approval
+- Social media campaigns need full plan review first
+`,
+  },
+  {
+    id: "listing",
+    name: "AI Listing Officer | AI 上架官",
+    skills: [
+      "x2c-publish",
+      "browser-use",
+      "web-search",
+      "web-scraping",
+      "summarize",
+      "xlsx",
+      "docx",
+      "pdf",
+      "scheduled-task",
+      "clawdstrike",
+      "find-skills",
+      "skill-creator",
+      "session-logs",
+      "tavily-search",
+      "tavily-research",
+      "tavily-extract",
+      "tavily-crawl",
+    ],
+    identity: `# IDENTITY.md - Who Am I?
+
+- **Name:** AI Listing Officer | AI 上架官
+- **Creature:** AI Content Catalog Manager — content listing, SEO optimization, platform catalog management
+- **Vibe:** Meticulous and data-driven, obsessed with discoverability; knows how to make content stand out in search results
+- **Emoji:** 📋
+`,
+    userPrefs: `# User Preferences — AI Listing Officer
+
+## Work Style
+- Provide data-backed SEO recommendations
+- Track listing performance metrics
+- Regular catalog health reports
+
+## Approval
+- Listing changes require user review before submission
+- SEO strategy changes need confirmation
 `,
   },
 ];
@@ -201,10 +288,7 @@ async function copyAgentTemplateFiles(agentId: string, workspaceDir: string): Pr
   }
 }
 
-async function writeGeneratedFiles(
-  workspaceDir: string,
-  agent: StoryclawAgentDef,
-): Promise<void> {
+async function writeGeneratedFiles(workspaceDir: string, agent: StoryclawAgentDef): Promise<void> {
   await fs.mkdir(workspaceDir, { recursive: true });
   const files: [string, string][] = [
     ["IDENTITY.md", agent.identity],
@@ -233,10 +317,10 @@ function setAgentSkills(cfg: OpenClawConfig, agentId: string, skills: string[]):
 }
 
 /**
- * Configures 3 default StoryClaw agents: main (AI Assistant), director, trader.
- * The "main" agent always gets updated (name, skills, workspace files) since it
- * is pre-created by onboarding and cannot be deleted. Other agents are skipped
- * if they already exist. Idempotent on re-runs.
+ * Configures 5 default StoryClaw agents: main (AI Assistant), director, trader,
+ * publisher, listing. The "main" agent always gets updated (name, skills,
+ * workspace files) since it is pre-created by onboarding and cannot be deleted.
+ * Other agents are skipped if they already exist. Idempotent on re-runs.
  */
 export async function ensureStoryclawAgents(
   config: OpenClawConfig,
@@ -264,7 +348,9 @@ export async function ensureStoryclawAgents(
     const sessionsDir = resolveSessionTranscriptsDirForAgent(agent.id);
     await fs.mkdir(sessionsDir, { recursive: true });
 
-    runtime.log(`Agent "${agent.name}" (${agent.id}) configured with ${agent.skills.length} skills.`);
+    runtime.log(
+      `Agent "${agent.name}" (${agent.id}) configured with ${agent.skills.length} skills.`,
+    );
   }
 
   return cfg;
