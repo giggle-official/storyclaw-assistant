@@ -46,7 +46,7 @@ const AUTH_CHOICE_GROUP_DEFS: {
   {
     value: "storyclaw",
     label: "StoryClaw",
-    hint: "Kimi Code 2.5 (recommended)",
+    hint: "MiniMax M2.5 (recommended)",
     choices: ["storyclaw-api-key"],
   },
   {
